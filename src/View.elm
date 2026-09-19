@@ -144,11 +144,29 @@ statsIcon =
         ]
 
 
+logo : Html Msg
+logo =
+    Svg.svg
+        [ SvgAttr.viewBox "0 0 280 120"
+        , SvgAttr.class "w-24 h-auto"
+        , SvgAttr.fill "currentColor"
+        ]
+        [ Svg.g
+            [ SvgAttr.style "font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; font-size: 80px; font-weight: 500;" ]
+            [ Svg.text_ [ SvgAttr.x "35", SvgAttr.y "90" ] [ Svg.text "q" ]
+            , Svg.text_ [ SvgAttr.x "95", SvgAttr.y "98", SvgAttr.transform "rotate(-45 112 78)" ] [ Svg.text "e" ]
+            , Svg.text_ [ SvgAttr.x "150", SvgAttr.y "90" ] [ Svg.text "l" ]
+            , Svg.text_ [ SvgAttr.x "175", SvgAttr.y "90" ] [ Svg.text "m" ]
+            ]
+        ]
+
+
 viewHeader : Model -> Html Msg
 viewHeader model =
     Html.header [ class "relative z-10 w-full flex justify-between items-center mb-8" ]
         [ div [ class "flex flex-col" ]
-            [ h1 [ class "text-xl font-medium tracking-[0.2em] text-slate-700 dark:text-slate-300 lowercase" ] [ text "qelm" ]
+            [ h1 [ class "text-xl font-medium tracking-[0.2em] text-slate-700 dark:text-slate-300 lowercase" ]
+                [ logo ]
             , span [ class "text-[10px] text-stone-400 dark:text-stone-400 tracking-widest uppercase" ] [ text "Amharic Typing Practice" ]
             ]
         , div [ class "flex items-center gap-4 md:gap-6" ]
@@ -482,11 +500,16 @@ viewMetrics info dictationMode =
                     ]
                 ]
     in
-    div [ class "flex flex-wrap justify-center gap-3 md:gap-6 w-full" ]
-        ( [ viewMetric "Speed" (String.fromInt metrics.speed.new) "wpm" ""
-          , viewMetric "Accuracy" (String.fromInt metrics.accuracy.new) "%" ""
-          ] ++ (if dictationMode == PracticeMode then [] else [ viewMetric "Mastery" confStr "%" "Mastery reflects how consistently and quickly you can type this lesson's characters." ])
-        )
+    div [ class "flex flex-wrap justify-center gap-3 md:gap-6 w-full" ] <|
+        [ viewMetric "Speed" (String.fromInt metrics.speed.new) "wpm" ""
+        , viewMetric "Accuracy" (String.fromInt metrics.accuracy.new) "%" ""
+        ]
+            ++ (if dictationMode == PracticeMode then
+                    []
+
+                else
+                    [ viewMetric "Mastery" confStr "%" "Mastery reflects how consistently and quickly you can type this lesson's characters." ]
+               )
 
 
 viewDictation : Bool -> Dictation -> Int -> Html Msg
@@ -598,7 +621,8 @@ dispatchHelper modMsg regularMsg key =
 
 isModifierCode : String -> Bool
 isModifierCode code =
-    code == "CapsLock"
+    code
+        == "CapsLock"
         || String.startsWith "Shift" code
         || String.startsWith "Alt" code
         || String.startsWith "Control" code
